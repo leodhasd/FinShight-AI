@@ -40,6 +40,13 @@
   }
 }
 
+/* Register an animatable angle for the AI Coach composer's animated gradient border */
+@property --coach-border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 @layer components {
   .glass {
     background: rgba(255, 255, 255, 0.05);
@@ -239,6 +246,556 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(139, 92, 246, 0.5);
+  }
+
+  /* Hide scrollbar but keep scrollability (used by AI Coach chips row) */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Premium chat scrollbar (AI Coach message area) */
+  .chat-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.4) transparent;
+  }
+
+  .chat-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.35);
+    border-radius: 999px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.55);
+  }
+
+  /* ============================================================
+     AI Financial Coach — Premium ChatGPT/Claude-style UI
+     ============================================================ */
+
+  /* Adaptive glass chat card */
+  .coach-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .coach-card:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  .light .coach-card {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 40px rgba(99, 102, 241, 0.08);
+  }
+
+  .light .coach-card:hover {
+    border-color: rgba(99, 102, 241, 0.22);
+  }
+
+  /* AI message bubble (premium card style) */
+  .ai-bubble {
+    position: relative;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    border-top-left-radius: 0.35rem;
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.12);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ai-bubble::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(217, 70, 239, 0.2), transparent 60%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .ai-bubble:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.16);
+  }
+
+  .light .ai-bubble {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.05);
+  }
+
+  .light .ai-bubble::before {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(217, 70, 239, 0.35), transparent 60%);
+  }
+
+  /* AI avatar */
+  .coach-avatar {
+    background: linear-gradient(135deg, #6366f1, #d946ef);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
+  }
+
+  /* User bubble — gradient */
+  .coach-user-bubble {
+    background: linear-gradient(135deg, #6366f1, #a855f7 60%, #d946ef);
+    box-shadow: 0 6px 24px rgba(139, 92, 246, 0.28);
+  }
+
+  .light .coach-user-bubble {
+    background: linear-gradient(135deg, #4f46e5, #9333ea 60%, #c026d3);
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.28);
+  }
+
+  /* Suggestion chips */
+  .coach-chip {
+    position: relative;
+    overflow: hidden;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgb(203 213 225);
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease,
+      background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .coach-chip::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(217, 70, 239, 0.14));
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  .coach-chip:hover {
+    transform: translateY(-2px);
+    border-color: rgba(139, 92, 246, 0.4);
+    background-color: rgba(99, 102, 241, 0.12);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.18);
+  }
+
+  .coach-chip:hover::after {
+    opacity: 1;
+  }
+
+  .coach-chip:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .light .coach-chip {
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    color: rgb(51 65 85);
+  }
+
+  .light .coach-chip:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+    background-color: rgba(99, 102, 241, 0.08);
+    color: rgb(67 56 202);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.14);
+  }
+
+  /* Premium chat composer (glassmorphism + animated gradient border) */
+  .coach-composer {
+    position: relative;
+    border-radius: 22px;
+    padding: 1px;
+    background:
+      conic-gradient(
+        from var(--coach-border-angle),
+        rgba(99, 102, 241, 0.6),
+        rgba(217, 70, 239, 0.45),
+        rgba(34, 211, 238, 0.4),
+        rgba(99, 102, 241, 0.6)
+      );
+    animation: coach-border-spin 6s linear infinite;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .coach-composer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.16);
+  }
+
+  .coach-composer:focus-within {
+    animation-play-state: paused;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 0 44px rgba(139, 92, 246, 0.3);
+  }
+
+  .coach-composer__inner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 90px;
+    border-radius: 21px;
+    padding: 1rem 1.25rem 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background-color 0.3s ease;
+  }
+
+  .coach-composer:focus-within .coach-composer__inner {
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .light .coach-composer {
+    background:
+      conic-gradient(
+        from var(--coach-border-angle),
+        rgba(79, 70, 229, 0.55),
+        rgba(192, 38, 211, 0.4),
+        rgba(8, 145, 178, 0.35),
+        rgba(79, 70, 229, 0.55)
+      );
+  }
+
+  .light .coach-composer:focus-within {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), 0 0 40px rgba(99, 102, 241, 0.18);
+  }
+
+  .light .coach-composer__inner {
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  .light .coach-composer:focus-within .coach-composer__inner {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  @keyframes coach-border-spin {
+    from {
+      --coach-border-angle: 0deg;
+    }
+    to {
+      --coach-border-angle: 360deg;
+    }
+  }
+
+  /* Textarea */
+  .coach-textarea {
+    width: 100%;
+    min-height: 56px;
+    max-height: 168px; /* ~5 lines */
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: rgb(var(--color-text));
+    font-size: 0.9rem;
+    line-height: 1.55;
+    caret-color: rgb(129 140 248);
+    transition: color 0.3s ease;
+  }
+
+  .coach-textarea::placeholder {
+    color: rgb(var(--color-muted));
+    opacity: 0.75;
+  }
+
+  .coach-textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Animated typing cursor shown while the composer is focused */
+  .coach-caret::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #818cf8, #e879f9);
+    animation: coach-caret-blink 1s step-end infinite;
+  }
+
+  @keyframes coach-caret-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Send button */
+  .coach-send {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #6366f1, #a855f7, #d946ef);
+    color: #fff;
+    overflow: hidden;
+    box-shadow: 0 6px 22px rgba(139, 92, 246, 0.35);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease,
+      opacity 0.25s ease, filter 0.25s ease;
+  }
+
+  .coach-send:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 32px rgba(139, 92, 246, 0.45);
+    filter: brightness(1.06);
+  }
+
+  .coach-send:active:not(:disabled) {
+    transform: translateY(0) scale(0.94);
+  }
+
+  .coach-send:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+    box-shadow: none;
+  }
+
+  /* Click ripple */
+  .coach-ripple {
+    position: absolute;
+    border-radius: 9999px;
+    transform: scale(0);
+    background: rgba(255, 255, 255, 0.55);
+    animation: coach-ripple-anim 0.6s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes coach-ripple-anim {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  /* Typing dots */
+  .coach-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #818cf8, #e879f9);
+  }
+
+  .light .coach-dot {
+    background: linear-gradient(135deg, #6366f1, #c026d3);
+  }
+
+  /* Light-mode text adjustments inside the chat card */
+  .light .coach-text-muted {
+    color: rgb(100 116 139) !important;
+  }
+
+.light .coach-text-bright {
+    color: rgb(15 23 42) !important;
+  }
+
+  /* ===== Theme-aware AI Coach utility classes ===== */
+
+  /* Chat header divider */
+  .coach-chat-header {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .light .coach-chat-header {
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Trash / clear button */
+  .coach-trash-btn {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgb(148 163 184);
+  }
+
+  .coach-trash-btn:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+    color: rgb(252 165 165);
+  }
+
+  .light .coach-trash-btn {
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    color: rgb(100 116 139);
+  }
+
+  .light .coach-trash-btn:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    color: rgb(220 38 38);
+  }
+
+  /* Error box */
+  .coach-error-box {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+    color: rgb(252 165 165);
+  }
+
+  .light .coach-error-box {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    color: rgb(185 28 28);
+  }
+
+  /* Section dividers (suggested chips, composer) */
+  .coach-section-divider {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .light .coach-section-divider {
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* KBD (keyboard shortcut) */
+  .coach-kbd {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgb(148 163 184);
+  }
+
+  .light .coach-kbd {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgb(71 85 105);
+  }
+
+  /* Skeleton card */
+  .coach-skeleton-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .light .coach-skeleton-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  /* Skeleton bar */
+  .coach-skeleton-bar {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .light .coach-skeleton-bar {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Divider inside skeleton */
+  .coach-divider {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .light .coach-divider {
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Markdown code */
+  .coach-md-code {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgb(240 171 252);
+  }
+
+  .light .coach-md-code {
+    background: rgba(0, 0, 0, 0.06);
+    color: rgb(147 51 234);
+  }
+
+  /* Markdown bold */
+  .coach-md-strong {
+    color: #fff;
+  }
+
+  .light .coach-md-strong {
+    color: rgb(15 23 42);
+  }
+
+  /* Markdown italic / em */
+  .coach-md-em {
+    color: rgb(199 210 254);
+  }
+
+  .light .coach-md-em {
+    color: rgb(79 70 229);
+  }
+
+  /* Markdown heading */
+  .coach-md-heading {
+    color: #fff;
+  }
+
+  .light .coach-md-heading {
+    color: rgb(15 23 42);
+  }
+
+  /* Chip dot */
+  .coach-chip-dot {
+    background: linear-gradient(135deg, #818cf8, #e879f9);
+  }
+
+  .light .coach-chip-dot {
+    background: linear-gradient(135deg, #6366f1, #c026d3);
+  }
+
+  /* Status badge */
+  .coach-status {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .light .coach-status {
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .coach-status--online {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.15);
+    color: rgb(110 231 183);
+  }
+
+  .light .coach-status--online {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+    color: rgb(4 120 87);
+  }
+
+  .coach-status--pending {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.15);
+    color: rgb(252 211 77);
+  }
+
+  .light .coach-status--pending {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.1);
+    color: rgb(180 83 9);
   }
 }
 

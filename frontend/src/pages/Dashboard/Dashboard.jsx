@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useInView, animate } from 'framer-motion';
 import AiAlertCenter from '../../components/AiAlertCenter/AiAlertCenter';
 import FinancialGoals from '../../components/FinancialGoals/FinancialGoals';
+import AiFinancialCoach from '../../components/AiFinancialCoach/AiFinancialCoach';
+import FinancialHealthScore from '../../components/FinancialHealthScore/FinancialHealthScore';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -741,6 +743,12 @@ export default function Dashboard() {
 
         {/* ------------------- Smart Financial Goals ------------------- */}
         <FinancialGoals latest={latest} summary={summary} loading={loading} />
+
+        {/* ------------------- AI Financial Coach ------------------- */}
+        <AiFinancialCoach latest={latest} summary={summary} loading={loading} />
+
+        {/* ------------------- AI Financial Health Score ------------------- */}
+        <FinancialHealthScore latest={latest} summary={summary} loading={loading} />
 
         {/* ------------------- Quick Summary ------------------- */}
         <motion.section

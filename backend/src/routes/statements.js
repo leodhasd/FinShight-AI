@@ -3,6 +3,7 @@ const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
 const { statementController } = require('../controllers/statementController');
 const { aiInsightsController } = require('../controllers/aiInsightsController');
+const { aiCoachController } = require('../controllers/aiCoachController');
 
 const router = express.Router();
 
@@ -17,6 +18,9 @@ router.get('/:id/transactions/export', authMiddleware, statementController.expor
 
 // GET /api/statements/:statementId/ai-insights - Get AI financial insights
 router.get('/:statementId/ai-insights', authMiddleware, aiInsightsController.getStatementAiInsights);
+
+// POST /api/statements/:statementId/ai-coach/ask - Ask the AI Financial Coach a question
+router.post('/:statementId/ai-coach/ask', authMiddleware, aiCoachController.askFinancialCoach);
 
 module.exports = router;
 
