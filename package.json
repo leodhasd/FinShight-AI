@@ -1,0 +1,19 @@
+{
+  "name": "finsight-ai",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "npm --prefix backend run dev",
+    "dev": "concurrently -n frontend,backend -c blue,green \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\"",
+    "build": "npm --prefix frontend run build",
+    "lint": "npm --prefix frontend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "framer-motion": "^12.43.0"
+  }
+}
