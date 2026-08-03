@@ -112,6 +112,9 @@ async function sendVerificationEmail({ to, fullName, rawToken, userId }) {
 
   console.log("BEFORE SEND MAIL");
 
+  await transporter.verify();
+  console.log("SMTP VERIFIED");
+
   const info = await t.sendMail(mailOptions);
 
   console.log("AFTER SEND MAIL");
