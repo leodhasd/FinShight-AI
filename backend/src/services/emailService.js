@@ -110,15 +110,23 @@ async function sendVerificationEmail({ to, fullName, rawToken, userId }) {
     `
   };
 
+  try {
   console.log("BEFORE SEND MAIL");
 
   await transporter.verify();
   console.log("SMTP VERIFIED");
 
-  const info = await t.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
 
   console.log("AFTER SEND MAIL");
   console.log(info);
+
+  return { info, etherealPreviewUrl };
+
+} catch (err) {
+  console.error("SMTP FULL ERROR:", err);
+  throw err;
+}
 
   console.log("EMAIL SENT:", info.messageId);
 
