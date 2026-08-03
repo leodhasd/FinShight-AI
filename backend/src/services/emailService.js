@@ -110,7 +110,12 @@ async function sendVerificationEmail({ to, fullName, rawToken, userId }) {
     `
   };
 
+  console.log("BEFORE SEND MAIL");
+
   const info = await t.sendMail(mailOptions);
+
+  console.log("AFTER SEND MAIL");
+  console.log(info);
 
   console.log("EMAIL SENT:", info.messageId);
 
