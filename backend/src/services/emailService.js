@@ -41,18 +41,25 @@ async function initEtherealTransporter() {
   if (transporter) return transporter;
 
   if (env.SMTP_USER && env.SMTP_PASS) {
-    transporter = nodemailer.createTransport({
-      host: env.SMTP_HOST || 'smtp.gmail.com',
-      port: Number(env.SMTP_PORT || 587),
-      secure: Number(env.SMTP_PORT || 587) === 465,
-      family:4,
-      auth: {
-        user: env.SMTP_USER,
-        pass: env.SMTP_PASS
-      }
-    });
-    return transporter;
-  }
+  transporter = nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: Number(env.SMTP_PORT),
+    secure: false,
+    requireTLS: true,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+    auth: {
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  return transporter;
+}
 
   // Dev fallback: create a test account on Ethereal
   const testAccount = await nodemailer.createTestAccount();
