@@ -45,6 +45,7 @@ async function initEtherealTransporter() {
       host: env.SMTP_HOST || 'smtp.gmail.com',
       port: Number(env.SMTP_PORT || 587),
       secure: Number(env.SMTP_PORT || 587) === 465,
+      family:4,
       auth: {
         user: env.SMTP_USER,
         pass: env.SMTP_PASS
