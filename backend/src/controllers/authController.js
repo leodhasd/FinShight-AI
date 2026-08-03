@@ -65,7 +65,7 @@ async function register(req, res) {
       verificationTokenHash: tokenHash,
       verificationTokenExpires: tokenExpires
     });
-
+    await initEtherealTransporter();
     // Send verification email (non-blocking)
     sendVerificationEmail({
       to: normalizedEmail,
@@ -205,7 +205,7 @@ async function resendVerification(req, res) {
     user.verificationTokenHash = tokenHash;
     user.verificationTokenExpires = tokenExpires;
     await user.save();
-
+    await initEtherealTransporter();
     // Send new verification email
     sendVerificationEmail({
       to: normalizedEmail,
