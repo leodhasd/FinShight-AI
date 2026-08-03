@@ -112,6 +112,8 @@ async function sendVerificationEmail({ to, fullName, rawToken, userId }) {
 
   const info = await t.sendMail(mailOptions);
 
+  console.log("EMAIL SENT:", info.messageId);
+
   // For dev/Ethereal, log the preview URL so the email can be opened in a browser.
   if (info && info.messageId && info.messageId.includes('ethereal')) {
     etherealPreviewUrl = nodemailer.getTestMessageUrl(info);
