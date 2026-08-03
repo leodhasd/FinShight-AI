@@ -80,6 +80,7 @@ function getTransporter() {
  * Send a verification email with a link to the frontend verify-email page.
  */
 async function sendVerificationEmail({ to, fullName, rawToken, userId }) {
+  console.log("SENDING EMAIL TO:", to);
   const t = getTransporter();
   const verifyUrl = buildVerificationUrl({ rawToken, userId });
 
