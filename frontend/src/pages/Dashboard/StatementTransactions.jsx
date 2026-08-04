@@ -30,6 +30,8 @@ function getToken() {
     return null;
   }
 }
+const API_BASE =
+import.meta.env.VITE_API_BASE_URL || "https://finshight-ai.onrender.com";
 
 export default function StatementTransactions() {
   const { id } = useParams();
@@ -108,9 +110,14 @@ export default function StatementTransactions() {
       if (debouncedFilters.maxDebit) params.set('maxDebit', debouncedFilters.maxDebit);
       if (debouncedFilters.search) params.set('search', debouncedFilters.search);
 
-      const res = await fetch(`/api/statements/${id}/transactions?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await fetch(
+  `${API_BASE}/api/statements/${id}/transactions?${params.toString()}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) throw new Error(data?.message || 'Failed to load transactions');
@@ -141,10 +148,15 @@ export default function StatementTransactions() {
     setError('');
 
     try {
-      const res = await fetch(`/api/statements/${id}/process`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await fetch(
+  `${API_BASE}/api/statements/${id}/process`,
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) throw new Error(data?.message || 'Failed to process statement');
@@ -178,9 +190,14 @@ export default function StatementTransactions() {
     setAiError('');
 
     try {
-      const res = await fetch(`/api/statements/${id}/ai-insights`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await fetch(
+  `${API_BASE}/api/statements/${id}/ai-insights`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) throw new Error(data?.message || 'Failed to load AI insights');
