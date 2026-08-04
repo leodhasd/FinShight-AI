@@ -20,6 +20,8 @@ function getToken() {
     return null;
   }
 }
+const API_BASE =
+import.meta.env.VITE_API_BASE_URL || "https://finshight-ai.onrender.com";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_MIME_TYPES = new Set(['application/pdf', 'text/csv', 'application/vnd.ms-excel']);
@@ -53,7 +55,7 @@ export default function BankStatementUpload() {
       setLoadingUploads(true);
       setError('');
       try {
-        const res = await fetch('/api/uploads/bank-statements', {
+        const res = await fetch(`${API_BASE}/api/uploads/bank-statements`, {
           method: 'GET',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -118,7 +120,7 @@ export default function BankStatementUpload() {
 
       await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/uploads/bank-statements', true);
+        xhr.open('POST', `${API_BASE}/api/uploads/bank-statements`, true);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
         xhr.upload.onprogress = (event) => {
@@ -171,7 +173,7 @@ export default function BankStatementUpload() {
 
       // Refresh list (skip if password modal is showing — will refresh after unlock)
       if (!passwordModal.show) {
-        const refreshRes = await fetch('/api/uploads/bank-statements', {
+        const refreshRes = await fetch(`${API_BASE}/api/uploads/bank-statements`, {
           method: 'GET',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -192,7 +194,7 @@ export default function BankStatementUpload() {
 
     // Refresh uploads list
     try {
-      const refreshRes = await fetch('/api/uploads/bank-statements', {
+      const refreshRes = await fetch(`${API_BASE}/api/uploads/bank-statements`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
       });
