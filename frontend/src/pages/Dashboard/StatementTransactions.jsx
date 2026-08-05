@@ -30,8 +30,7 @@ function getToken() {
     return null;
   }
 }
-const API_BASE =
-import.meta.env.VITE_API_BASE_URL || "https://finshight-ai.onrender.com";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function StatementTransactions() {
   const { id } = useParams();
@@ -930,7 +929,7 @@ export default function StatementTransactions() {
                   if (debouncedFilters.maxDebit) params.set('maxDebit', debouncedFilters.maxDebit);
                   if (debouncedFilters.search) params.set('search', debouncedFilters.search);
 
-                  const res = await fetch(`/api/statements/${id}/transactions/export?${params.toString()}`, {
+const res = await fetch(`${API_BASE}/api/statements/${id}/transactions/export?${params.toString()}`, {
                     headers: { Authorization: `Bearer ${token}` }
                   });
 

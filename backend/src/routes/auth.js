@@ -47,35 +47,6 @@ router.post(
   authController.login
 );
 
-// POST /api/auth/verify-email
-router.post(
-  '/verify-email',
-  [
-    body('token')
-      .isString()
-      .notEmpty()
-      .withMessage('token is required'),
-    body('userId')
-      .isString()
-      .notEmpty()
-      .withMessage('userId is required')
-  ],
-  authController.verifyEmail
-);
-
-// POST /api/auth/resend-verification
-router.post(
-  '/resend-verification',
-  [
-    body('email')
-      .isString()
-      .trim()
-      .isEmail()
-      .withMessage('email must be a valid email address')
-  ],
-  authController.resendVerification
-);
-
 // POST /api/auth/logout
 router.post('/logout', authController.logout);
 

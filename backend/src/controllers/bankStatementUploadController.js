@@ -157,8 +157,17 @@ async function handleUpload(req, res) {
       return res.status(400).json({ status: 'error', message: err.message });
     }
 
-    if (err && err.code === 'LIMIT_FILE_SIZE') {
+if (err && err.code === 'LIMIT_FILE_SIZE') {
       return res.status(413).json({ status: 'error', message: 'File too large. Max 10MB.' });
+    }
+
+    // Race condition: two requests for the same file passed the duplicate check,
+    // and writeBufferToDisk (flag: 'wx') threw EEXIST for the second one.
+    if (err && err.code === 'EEXIST') {
+      return res.status(409).json({
+        status: 'error',
+        message: 'Duplicate upload: this statement was already uploaded.'
+      });
     }
 
     return res.status(500).json({ status: 'error', message: err?.message || 'Upload failed' });
@@ -185,7 +194,12 @@ async function unlockAndProcess(req, res) {
       return res.status(401).json({ status: 'error', message: 'Unauthorized' });
     }
 
-    const statementId = req.params.id;
+const statementId = req.params.id;
+
+    // Validate ObjectId to avoid Mongoose CastError (500) on malformed IDs
+    if (!mongoose.Types.ObjectId.isValid(statementId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid statement ID' });
+    }
 
     // Validate password presence
     if (!password || typeof password !== 'string' || password.length === 0) {

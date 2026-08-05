@@ -1,34 +1,40 @@
-# FinSight AI — AI Coach Premium UI Enhancement (Phase 6)
+# Email Verification Removal Audit - Task List
 
-## Scope
-- Premium AI Coach header
-- Improved suggestion chips
-- Full-width premium chat composer
-- Larger auto-growing textarea
-- Send button inside the composer
-- Better message bubbles
-- Typing indicator animation
-- Smooth UI animations
-- Responsive layout
-- Light/Dark mode support
+## 1. Add temporary debug logs to authController.js
+- [x] Log register() executed
+- [x] Log login() executed
+- [x] Log user loaded from DB
+- [x] Log user.isVerified value
+- [x] Log response returned
 
-## Status
-- [x] Inspect existing AI Coach component + related CSS
-- [x] Verify existing premium UI foundation (composer, chips, typing indicator, animations)
-- [x] Confirm light/dark theme setup (CSS variables + `.light` overrides)
-- [x] Confirm baseline build passes
+## 2. Remove stale email-verification logic from frontend source
+- [x] Remove VerifyEmail.jsx usage from App.jsx
+- [x] Remove `/verify-email` route from App.jsx
+- [x] Delete frontend/src/pages/Auth/VerifyEmail.jsx
+- [x] Confirm Login.jsx / Register.jsx have no `needsVerification` / `resend-verification`
+- [x] Clean emailService.js (remove verification token/email functions)
 
-## Implementation Steps
-- [ ] Make inline markdown renderer theme-aware (headings, bold, italic, code)
-- [ ] Replace dark-only skeleton / header / trash-button / kbd / error / status classes with theme-aware CSS classes
-- [ ] Upgrade suggestion chips with accent sparkle dot + polish
-- [ ] Enlarge auto-growing textarea (min/max height) for premium composer
-- [ ] Refine message bubbles + typing indicator polish
-- [ ] Add new theme-aware utility classes to `index.css` (dark + light)
-- [ ] Verify production build passes
-- [ ] Fix only compile/UI errors if any
-- [ ] Stop and report
+## 3. Delete old frontend production build and generate fresh build
+- [x] Delete frontend/dist
+- [ ] Rebuild frontend (npm run build) - BLOCKED by memory alloc failure, retry
 
-## Verification
-- [ ] `npm run build` succeeds in `frontend/`
+## 4. Search entire project for stale verification references
+- [ ] isVerified / needsVerification / verify-email / resend-verification / verificationToken / verificationTokenHash / verificationTokenExpires / "Please verify your email before logging in"
+- [ ] Remove unused frontend references
 
+## 5. Confirm login uses only email, password, bcrypt, JWT
+- [ ] Verify no email verification checks in login
+
+## 6. Run end-to-end verification
+- [ ] Register a new user
+- [ ] Confirm MongoDB stores isVerified:true
+- [ ] Login successfully
+- [ ] Confirm no response contains "Please verify your email before logging in"
+
+## 7. Remove temporary debug logs after verification
+- [ ] Remove debug logs from authController.js
+
+## 8. Report
+- [ ] Files modified
+- [ ] Exact changes
+- [ ] Verification results

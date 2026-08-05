@@ -1,51 +1,18 @@
-const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 const { env } = require('../config/env');
 
 let transporter = null;
-let etherealPreviewUrl = null;
 
 /**
- * Generate a secure random verification token and its sha256 hash.
- * Only the hash is stored in the DB; the raw token is sent to the user.
+ * Create a nodemailer transporter from SMTP env config.
  */
-function generateVerificationToken() {
-  const rawToken = crypto.randomBytes(32).toString('hex');
-  const hash = crypto.createHash('sha256').update(rawToken).digest('hex');
-  return { rawToken, hash };
-}
-
-/**
- * Hash a raw token so it can be compared against the stored hash.
- */
-function hashToken(rawToken) {
-  return crypto.createHash('sha256').update(String(rawToken)).digest('hex');
-}
-
-/**
- * Build the frontend verification URL from CLIENT_ORIGIN.
- */
-function buildVerificationUrl({ rawToken, userId }) {
-  const origin = env.CLIENT_ORIGIN || 'http://localhost:5173';
-  const base = origin.replace(/\/+$/, '');
-  return `${base}/verify-email?token=${encodeURIComponent(rawToken)}&userId=${encodeURIComponent(userId)}`;
-}
-
-/**
- * Initialize the nodemailer transporter.
- * - If SMTP credentials are present in env, use them.
- * - Otherwise fall back to Ethereal (dev) so tests/dev still work.
- */
-async function initEtherealTransporter() {
-  if (transporter) return transporter;
-
-  if (env.SMTP_USER && env.SMTP_PASS) {
-  transporter = nodemailer.createTransport({
+function createSmtpTransporter() {
+  return nodemailer.createTransport({
     host: env.SMTP_HOST,
     port: Number(env.SMTP_PORT),
-    secure: false,
-    requireTLS: true,
+    secure: env.SMTP_SECURE === true,
+    requireTLS: !env.SMTP_SECURE,
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000,
@@ -57,13 +24,14 @@ async function initEtherealTransporter() {
       rejectUnauthorized: false
     }
   });
-
-  return transporter;
 }
 
-  // Dev fallback: create a test account on Ethereal
+/**
+ * Create an Ethereal (dev/test) transporter.
+ */
+async function createEtherealTransporter() {
   const testAccount = await nodemailer.createTestAccount();
-  transporter = nodemailer.createTransport({
+  const t = nodemailer.createTransport({
     host: testAccount.smtp.host,
     port: testAccount.smtp.port,
     secure: testAccount.smtp.secure,
@@ -73,6 +41,44 @@ async function initEtherealTransporter() {
     }
   });
 
+  // eslint-disable-next-line no-console
+  console.log('[Email] Using Ethereal test transport (dev)');
+
+  return t;
+}
+
+/**
+ * Initialize the nodemailer transporter.
+ * - If SMTP credentials are present in env, use them (and verify).
+ * - If SMTP auth fails (e.g. bad/missing credentials), fall back to Ethereal
+ *   so any email flow still works in development instead of failing silently.
+ */
+async function initEtherealTransporter() {
+  if (transporter) return transporter;
+
+  if (env.SMTP_USER && env.SMTP_PASS) {
+    const candidate = createSmtpTransporter();
+    try {
+      await candidate.verify();
+      transporter = candidate;
+      // eslint-disable-next-line no-console
+      console.log(`[Email] SMTP transport verified (${env.SMTP_HOST}:${env.SMTP_PORT})`);
+      return transporter;
+    } catch (err) {
+      // SMTP auth/config failed — do not expose the password in logs.
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[Email] SMTP verification failed (${env.SMTP_HOST}:${env.SMTP_PORT}): ${err && err.message ? err.message : err}`
+      );
+      // Proceed to Ethereal fallback below.
+    }
+  } else {
+    // eslint-disable-next-line no-console
+    console.log('[Email] No SMTP credentials provided; using Ethereal test transport (dev)');
+  }
+
+  // Dev fallback: create a test account on Ethereal
+  transporter = await createEtherealTransporter();
   return transporter;
 }
 
@@ -83,75 +89,7 @@ function getTransporter() {
   return transporter;
 }
 
-/**
- * Send a verification email with a link to the frontend verify-email page.
- */
-async function sendVerificationEmail({ to, fullName, rawToken, userId }) {
-  console.log("SENDING EMAIL TO:", to);
-  const t = getTransporter();
-  const verifyUrl = buildVerificationUrl({ rawToken, userId });
-
-  const from = env.SMTP_FROM || 'FinSight AI <noreply@finsightai.com>';
-  const mailOptions = {
-    from,
-    to,
-    subject: 'Verify your FinSight AI account',
-    html: `
-      <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:12px;">
-        <h2 style="margin:0 0 12px;color:#111827;">Verify your email</h2>
-        <p style="color:#4b5563;line-height:1.6;">Hi ${fullName || 'there'},</p>
-        <p style="color:#4b5563;line-height:1.6;">
-          Thanks for signing up for FinSight AI. Please confirm your email address by clicking the button below.
-        </p>
-        <p style="text-align:center;margin:28px 0;">
-          <a href="${verifyUrl}"
-             style="display:inline-block;background:linear-gradient(90deg,#6366f1,#d946ef);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;">
-            Verify Email
-          </a>
-        </p>
-        <p style="color:#6b7280;font-size:13px;line-height:1.5;">
-          This link expires in 24 hours. If you did not create an account, you can safely ignore this email.
-        </p>
-        <p style="color:#9ca3af;font-size:12px;">Or copy this link into your browser:<br/>${verifyUrl}</p>
-      </div>
-    `
-  };
-
-  try {
-  console.log("BEFORE SEND MAIL");
-
-  await transporter.verify();
-  console.log("SMTP VERIFIED");
-
-  const info = await transporter.sendMail(mailOptions);
-
-  console.log("AFTER SEND MAIL");
-  console.log(info);
-
-  return { info, etherealPreviewUrl };
-
-} catch (err) {
-  console.error("SMTP FULL ERROR:", err);
-  throw err;
-}
-
-  console.log("EMAIL SENT:", info.messageId);
-
-  // For dev/Ethereal, log the preview URL so the email can be opened in a browser.
-  if (info && info.messageId && info.messageId.includes('ethereal')) {
-    etherealPreviewUrl = nodemailer.getTestMessageUrl(info);
-    // eslint-disable-next-line no-console
-    console.log(`[Email] Preview URL: ${etherealPreviewUrl}`);
-  }
-
-  return { info, etherealPreviewUrl };
-}
-
 module.exports = {
-  generateVerificationToken,
-  hashToken,
   initEtherealTransporter,
-  sendVerificationEmail,
   getTransporter
 };
-

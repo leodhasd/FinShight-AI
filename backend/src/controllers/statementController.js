@@ -131,13 +131,18 @@ async function processStatement(req, res) {
 
     const statementId = req.params.id;
 
+    // Validate ObjectId to avoid Mongoose CastError (500) on malformed IDs
+    if (!mongoose.Types.ObjectId.isValid(statementId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid statement ID' });
+    }
+
     // Verify the statement belongs to this user and exists
     const statement = await BankStatementUpload.findOne({
       _id: statementId,
       ownerUserId
     }).lean();
 
-    if (!statement) {
+if (!statement) {
       return res.status(404).json({ status: 'error', message: 'Statement not found' });
     }
 
@@ -150,7 +155,10 @@ async function processStatement(req, res) {
     console.log('[StatementParser] ========================================');
 
     // Check if transactions were already processed
-    const existingCount = await Transaction.countDocuments({ statementId });
+    const existingCount = await Transaction.countDocuments({
+      statementId,
+      ownerUserId
+    });
     if (existingCount > 0) {
       console.log(`[StatementParser] Statement already processed: ${statement.originalFileName}, ${existingCount} existing transactions`);
       return res.status(200).json({
@@ -385,6 +393,11 @@ async function getTransactions(req, res) {
 
     const statementId = req.params.id;
 
+    // Validate ObjectId to avoid Mongoose CastError (500) on malformed IDs
+    if (!mongoose.Types.ObjectId.isValid(statementId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid statement ID' });
+    }
+
     // Verify the statement belongs to this user
     const statement = await BankStatementUpload.findOne({
       _id: statementId,
@@ -532,6 +545,11 @@ async function exportTransactions(req, res) {
     }
 
     const statementId = req.params.id;
+
+    // Validate ObjectId to avoid Mongoose CastError (500) on malformed IDs
+    if (!mongoose.Types.ObjectId.isValid(statementId)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid statement ID' });
+    }
 
     const statement = await BankStatementUpload.findOne({
       _id: statementId,

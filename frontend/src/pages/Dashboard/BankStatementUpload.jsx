@@ -20,8 +20,7 @@ function getToken() {
     return null;
   }
 }
-const API_BASE =
-import.meta.env.VITE_API_BASE_URL || "https://finshight-ai.onrender.com";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_MIME_TYPES = new Set(['application/pdf', 'text/csv', 'application/vnd.ms-excel']);

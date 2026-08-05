@@ -12,8 +12,10 @@ function getToken() {
   }
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 async function askCoach(statementId, question) {
-  const res = await fetch(`/api/statements/${statementId}/ai-coach/ask`, {
+  const res = await fetch(`${API_BASE}/api/statements/${statementId}/ai-coach/ask`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

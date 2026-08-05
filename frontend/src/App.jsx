@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import LandingPage from './pages/LandingPage/LandingPage.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
-import VerifyEmail from './pages/Auth/VerifyEmail.jsx';
 import Dashboard from './pages/Dashboard/Dashboard.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import BankStatementUpload from './pages/Dashboard/BankStatementUpload.jsx';
@@ -15,7 +14,6 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route
         path="/dashboard"
         element={
